@@ -1,0 +1,95 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/style.css" />
+    <title>chat app</title>
+  </head>
+  <body>
+    <section class="chat_section">
+      <div class="brand">
+        <img height="40" src="download.png" alt="" />
+        <h1>neerman❤️</h1>
+      </div>
+      <div class="message__area">
+
+      </div>
+      
+      <div>
+        <textarea
+          placeholder="writemessage"
+          id="textarea"
+          cols="30"
+          rows="10"
+        ></textarea>
+      </div>
+    </section>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>const socket = io();
+
+let name;
+
+let textarea = document.querySelector('#textarea')
+let messageArea = document.querySelector('.message__area')
+
+do {
+    name = prompt('please enter your name')
+} while (!name)
+
+textarea.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+
+        sendMessage(e.target.value)
+
+    }
+})
+
+function sendMessage(message) {
+    let msg = {
+        user: name,
+        message: message.trim()
+    }
+
+    //append
+    appendMessage(msg, 'outgoing')
+    textarea.value = ''
+
+    // send to server 
+    socket.emit('message', msg)
+
+}
+
+function appendMessage(msg, type) {
+    let mainDiv = document.createElement('div')
+    let className = type
+    mainDiv.classList.add(className, 'message')
+    let markup = `<h4>${msg.user}</h4>
+<p>${msg.message}</p>
+`
+
+    mainDiv.innerHTML = markup
+    messageArea.appendChild(mainDiv)
+}
+
+// receive messages
+
+
+socket.on('message', (msg) => {
+    appendMessage(msg,'incoming')
+    scrollToBottom()
+})
+
+
+function scrollToBottom() {
+    messageArea.scrollTop = messageArea.scrollHeight
+}</script>
+  </body>
+</html>
